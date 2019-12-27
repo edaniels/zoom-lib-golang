@@ -2,6 +2,7 @@ package zoom
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
@@ -79,7 +80,7 @@ func initializeDefault(c *Client) *Client {
 	return c
 }
 
-func (c *Client) executeRequest(opts requestV2Opts) (*http.Response, error) {
+func (c *Client) executeRequest(ctx context.Context, opts requestV2Opts) (*http.Response, error) {
 	client := c.httpClient()
 	req, err := c.addRequestAuth(c.httpRequest(opts))
 	if err != nil {
@@ -88,7 +89,7 @@ func (c *Client) executeRequest(opts requestV2Opts) (*http.Response, error) {
 
 	req.Header.Add("Content-Type", "application/json")
 
-	return client.Do(req)
+	return client.Do(req.WithContext(ctx))
 }
 
 func (c *Client) httpRequest(opts requestV2Opts) (*http.Request, error) {
@@ -131,11 +132,15 @@ func (c *Client) httpClient() *http.Client {
 }
 
 func (c *Client) requestV2(opts requestV2Opts) error {
+	return c.requestV2Context(context.Background(), opts)
+}
+
+func (c *Client) requestV2Context(ctx context.Context, opts requestV2Opts) error {
 	// make sure the defaultClient is not nil if we are using it
 	c = initializeDefault(c)
 
 	// execute HTTP request
-	resp, err := c.executeRequest(opts)
+	resp, err := c.executeRequest(ctx, opts)
 	if err != nil {
 		return err
 	}

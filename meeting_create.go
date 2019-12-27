@@ -1,6 +1,9 @@
 package zoom
 
-import "fmt"
+import (
+	"context"
+	"fmt"
+)
 
 // CreateMeetingOptions are the options to create a meeting with
 type CreateMeetingOptions struct {
@@ -27,8 +30,14 @@ func CreateMeeting(opts CreateMeetingOptions) (Meeting, error) {
 // CreateMeeting calls POST /users/{userId}/meetings
 // https://marketplace.zoom.us/docs/api-reference/zoom-api/meetings/meetingcreate
 func (c *Client) CreateMeeting(opts CreateMeetingOptions) (Meeting, error) {
+	return c.CreateMeetingContext(context.Background(), opts)
+}
+
+// CreateMeetingContext calls POST /users/{userId}/meetings
+// https://marketplace.zoom.us/docs/api-reference/zoom-api/meetings/meetingcreate
+func (c *Client) CreateMeetingContext(ctx context.Context, opts CreateMeetingOptions) (Meeting, error) {
 	var ret = Meeting{}
-	return ret, c.requestV2(requestV2Opts{
+	return ret, c.requestV2Context(ctx, requestV2Opts{
 		Method:         Post,
 		Path:           fmt.Sprintf(CreateMeetingPath, opts.HostID),
 		DataParameters: &opts,
