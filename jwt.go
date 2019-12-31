@@ -24,10 +24,16 @@ func (c *Client) addRequestAuth(req *http.Request, err error) (*http.Request, er
 		return nil, err
 	}
 
-	// establish JWT token
-	ss, err := jwtToken(c.Key, c.Secret)
-	if err != nil {
-		return nil, err
+	var ss string
+	if c.accessToken != "" {
+		ss = c.accessToken
+	} else {
+		// establish JWT token
+		var err error
+		ss, err = jwtToken(c.Key, c.Secret)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	if Debug {

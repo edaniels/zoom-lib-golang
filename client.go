@@ -35,11 +35,12 @@ var (
 
 // Client is responsible for making API requests
 type Client struct {
-	Key       string
-	Secret    string
-	Transport http.RoundTripper
-	Timeout   time.Duration // set to value > 0 to enable a request timeout
-	endpoint  string
+	Key         string
+	Secret      string
+	Transport   http.RoundTripper
+	Timeout     time.Duration // set to value > 0 to enable a request timeout
+	accessToken string
+	endpoint    string
 }
 
 // NewClient returns a new API client
@@ -54,6 +55,20 @@ func NewClient(apiKey string, apiSecret string) *Client {
 		Key:      apiKey,
 		Secret:   apiSecret,
 		endpoint: uri.String(),
+	}
+}
+
+// NewOAuth2Client returns a new API client
+func NewOAuth2Client(accessToken string) *Client {
+	var uri = url.URL{
+		Scheme: "https",
+		Host:   apiURI,
+		Path:   apiVersion,
+	}
+
+	return &Client{
+		accessToken: accessToken,
+		endpoint:    uri.String(),
 	}
 }
 
